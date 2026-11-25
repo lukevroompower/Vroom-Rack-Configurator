@@ -144,9 +144,12 @@ const CATS={
  rv:{name:'RV / camper',fam:'Vroom Rack RV Kit',groups:[
   {k:'color',lab:'2. Finish',opts:[['S','Silver'],['B','Black']],note:'2-rail kit for RV and camper roofs.'}]}
 };
-/* Fill in each kit's Amazon ASIN; blank ones link to the store. */
-const ASIN={'VR-CT-6F-S':'','VR-CT-6F-B':'','VR-CT-6C-S':'','VR-CT-6C-B':'','VR-CT-9F-S':'','VR-CT-9F-B':'','VR-CT-9C-S':'','VR-CT-9C-B':'','VR-CX-FL-S':'','VR-CX-AF-S':'','VR-RV-2-S':'','VR-RV-2-B':''};
-const link=(c,x)=>{const a=ASIN[sku(c,x)];return a?`https://www.amazon.com/dp/${a}`:STORE;};
+/* Amazon link per kit; blank ones go to the store until the listing is live. */
+const URLS={'VR-CT-6F-S':'https://a.co/d/02Pb7GRn','VR-CT-6F-B':'https://a.co/d/03Ui5gf3','VR-CT-6C-S':'','VR-CT-6C-B':'',
+'VR-CT-9F-S':'https://a.co/d/07YSLwf9','VR-CT-9F-B':'https://a.co/d/0bJGkL67','VR-CT-9C-S':'https://a.co/d/068Ho8iR','VR-CT-9C-B':'',
+'VR-CX-FL-S':'https://a.co/d/0bccggLf','VR-CX-AF-S':'https://a.co/d/0fUr3vwy','VR-RV-2-S':'https://a.co/d/01AkY2F8','VR-RV-2-B':'https://a.co/d/05pz4uC6'};
+const link=(c,x)=>URLS[sku(c,x)]||STORE;
+const live=(c,x)=>!!URLS[sku(c,x)];
 const DEF={trailer:{rails:'6',roof:'flat',color:'S'},container:{mount:'flat',color:'S'},rv:{color:'S'}};
 const COL={S:{n:'Silver',f:'#c3c9d1',s:'#7f8893'},B:{n:'Black',f:'#1c1f24',s:'#6b7280'}};
 let cat='trailer',o={...DEF.trailer};
@@ -245,13 +248,13 @@ function renderOut(){
  $('fig').innerHTML=`<svg viewBox="0 0 640 360" role="img" aria-label="${title(cat,o)}">${DRAW[cat](o)}</svg>`;
  $('nm').textContent=title(cat,o);
  const d=[['Application',CATS[cat].name],['Rails',railsOf(cat,o)],['Roof / install',mountOf(cat,o)],['Finish',COL[o.color].n]];
- $('buy').href=link(cat,o);
+ $('buy').href=link(cat,o);$('buy').textContent=live(cat,o)?'Buy on Amazon':'Coming soon: visit our store';
  $('dl').innerHTML=d.map(([a,b])=>`<div><dt>${a}</dt><dd>${b}</dd></div>`).join('');
  const cur=sku(cat,o);
  document.querySelectorAll('#rows tr').forEach(tr=>tr.classList.toggle('on',tr.dataset.sku===cur));
 }
 function renderRows(){
- $('rows').innerHTML=ALL.map(([c,x],i)=>`<tr tabindex="0" data-i="${i}" data-sku="${sku(c,x)}"><td>${CATS[c].name}</td><td>${railsOf(c,x)}</td><td>${mountOf(c,x)}</td><td><span class="chip"><span class="dot" style="background:${COL[x.color].f}"></span>${COL[x.color].n}</span></td><td><a href="${link(c,x)}" style="color:var(--co2);font-weight:600;white-space:nowrap">Amazon</a></td></tr>`).join('');
+ $('rows').innerHTML=ALL.map(([c,x],i)=>`<tr tabindex="0" data-i="${i}" data-sku="${sku(c,x)}"><td>${CATS[c].name}</td><td>${railsOf(c,x)}</td><td>${mountOf(c,x)}</td><td><span class="chip"><span class="dot" style="background:${COL[x.color].f}"></span>${COL[x.color].n}</span></td><td><a href="${link(c,x)}" style="color:var(--co2);font-weight:600;white-space:nowrap">${live(c,x)?'Buy on Amazon':'Coming soon'}</a></td></tr>`).join('');
 }
 function load(c,x){cat=c;o={...x};renderCats();renderOpts();renderOut();}
 function render(){renderCats();renderOpts();renderOut();}
